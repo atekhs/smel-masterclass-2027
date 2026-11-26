@@ -20,20 +20,28 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+      # Server and username may be stored as secrets or as plain variables.
+      FTP_SERVER: ${{ secrets.FTP_SERVER || vars.FTP_SERVER }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME || vars.FTP_USERNAME }}
+      HAS_PASSWORD: ${{ secrets.FTP_PASSWORD != '' }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Skip until FTP secrets are added
-        if: env.FTP_SERVER == ''
-        run: echo "::notice::FTP_SERVER secret not set yet, so nothing was uploaded."
+      - name: Check FTP settings (yes/no only, values are never printed)
+        run: |
+          echo "FTP_SERVER found:   $([ -n "$FTP_SERVER" ] && echo yes || echo NO)"
+          echo "FTP_USERNAME found: $([ -n "$FTP_USERNAME" ] && echo yes || echo NO)"
+          echo "FTP_PASSWORD found: $([ "$HAS_PASSWORD" = "true" ] && echo yes || echo NO)"
+          if [ -z "$FTP_SERVER" ] || [ -z "$FTP_USERNAME" ] || [ "$HAS_PASSWORD" != "true" ]; then
+            echo "::warning::FTP settings incomplete, so nothing was uploaded. Add them under Settings > Secrets and variables > Actions > Secrets > New repository secret."
+          fi
 
       - name: Upload site over FTP
-        if: env.FTP_SERVER != ''
+        if: env.FTP_SERVER != '' && env.FTP_USERNAME != '' && env.HAS_PASSWORD == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
+          server: ${{ env.FTP_SERVER }}
+          username: ${{ env.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: ./
           exclude: |
