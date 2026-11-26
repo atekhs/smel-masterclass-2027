@@ -3,9 +3,10 @@
 Static website for the Strategic Management & Executive Leadership Masterclass,
 Kigali Marriott Hotel, Kigali, Rwanda, 22–27 February 2027.
 
-The whole site is one file, `index.html`, with 66 pages addressed by `#` links
-(for example `/#capstone-1`, `/#registration`). It needs no build step, database
-or server-side code, so it runs on any Hostinger plan.
+A static site of 66 HTML pages (`index.html` is the home page) with shared files in
+`assets/` (`css/style.css`, `js/site.js`, `img/`). It needs no build step, database
+or server-side code, so it runs on any Hostinger plan. Upload everything in this
+folder, except `.github/` and `README.md`, into `public_html/smelretreat`.
 
 ## Deploying to Hostinger
 Every push to `main` is uploaded to https://afroindustrygroup.africa/smelretreat/
